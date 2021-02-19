@@ -1,0 +1,66 @@
+---
+title: "Data Clustering"
+author: "Javier Ramirez Cospin"
+date: "18/2/2021"
+output: html_document
+---
+
+### Instalacion de paquetes
+```{r }
+install.packages('cluster') # Calculo de Siluetas
+install.packages('e1071') # Cmeans
+install.packages('mclust') # mixtures of gaussians
+install.packages('ppclust')
+install.packages('fpc') # plotcluster
+install.packages('NbClust') # Determinar el numero de clusters optimo
+install.packages('factoextra') # Hacer graficos de clustering
+install.packages('tidyverse') # Manipulacion data set
+```
+ ### Carga de librerias
+```{r }
+library('cluster')
+library('e1071')
+library('mclust')
+library('fpc')
+library('NbClust')
+library('factoextra')
+library('tidyverse')
+library('readr')
+library('ppclust')
+```
+
+### Carga de Archivo y Preprocessamiento
+```{r }
+datos <- read.csv("tmdb-movies.csv",TRUE,",")
+datos <- as.data.frame(unclass(datos))
+dataClean <- na.omit(datos)
+datos <- select(dataClean,popularity,budget,revenue,runtime,vote_count,vote_average,release_year,budget_adj,revenue_adj)
+scaledData <- as.matrix(scale(datos))
+```
+### Metodo de Codo (Elbow Method) para determinar numero optimo de clusters
+``` {r }
+k.max  <- 25
+wss <- sapply(1:k.max, 
+              function(k){kmeans(scaledData,k,iter.max = 100 )$tot.withinss})
+plot(1:k.max,wss,
+        type="b",
+        xlab="No. clusters",
+        ylab="No. Suma de cuadrados")
+```
+### Metodo de agrupamiento Kmeans
+``` {r }
+km <- kmeans(scaledData,12,iter.max=100)
+summary(km)
+```
+
+### Metodo de agrupamiento Fuzzy C Means
+``` {r }
+res.fcm = fcm(scaledData,centers=12)
+summary(res.fcm)
+```
+
+### Metodo de agrupamiento Mixture of Gaussians
+``` {r }
+mg = Mclust(scaledData,G=12)
+summary(mg,parameters=TRUE)
+```
