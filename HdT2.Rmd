@@ -1,0 +1,74 @@
+### Instalacion de paquetes
+```{r }
+install.packages('cluster') # Calculo de Siluetas
+install.packages('e1071') # Cmeans
+install.packages('mclust') # mixtures of gaussians
+install.packages('ppclust')
+install.packages('fpc') # plotcluster
+install.packages('NbClust') # Determinar el numero de clusters optimo
+install.packages('factoextra') # Hacer graficos de clustering
+install.packages('tidyverse') # Manipulacion data set
+```
+### Carga de librerias
+```{r }
+install.packages('vegan')
+library('cluster')
+library('e1071')
+library('mclust')
+library('fpc')
+library('vegan')
+library('NbClust')
+library('factoextra')
+library('tidyverse')
+library('readr')
+library('ppclust')
+```
+
+### Carga de Archivo y Preprocessamiento
+```{r }
+datos <- read.csv("tmdb-movies.csv",TRUE,",")
+datos <- as.data.frame(unclass(datos))
+dataClean <- na.omit(datos)
+datos <- select(dataClean,popularity,budget,revenue,runtime,vote_count,vote_average,budget_adj,revenue_adj)
+scaledData <- as.matrix(scale(datos))
+head(scaledData)
+```
+### Metodo de Codo (Elbow Method) para determinar numero optimo de clusters
+``` {r }
+k.max  <- 25
+wss <- sapply(1:k.max, 
+              function(k){kmeans(scaledData,k,iter.max = 100 )$tot.withinss})
+plot(1:k.max, wss,
+        type="b",
+        xlab="No. clusters",
+        ylab="No. Suma de cuadrados")
+```
+### Metodo de agrupamiento Kmeans
+``` {r }
+km <- kmeans(scaledData,5,100)
+#fviz_cluster(km, geom="point", data = scaledData) + ggtitle("Kmean algorithm")
+#clarakm <- clara(scaledData, 4, samples=100)
+#fviz_silhouette(clarakm, label = FALSE, print.summary = TRUE)
+#dis = dist(scaledData)^2
+sil = silhouette (km$cluster, dis)
+dev.new(width=5,height=8,noRStudioGD = TRUE, unit="in")
+plot(sil, col=1:5, border = NA)
+```
+
+### Metodo de agrupamiento Fuzzy C Means
+``` {r }
+#res.fcm = fcm(scaledData,centers=4)
+#res.fcm$cluster
+sil = silhouette (res.fcm$cluster, dis)
+dev.new(width=5,height=4,noRStudioGD = TRUE, unit='in')
+plot(sil, col=1:4, border = NA)
+```
+
+### Metodo de agrupamiento Mixture of Gaussians
+``` {r }
+mg = Mclust(scaledData,G=4)
+#mg$classification
+sil = silhouette (mg$classification, dis)
+dev.new(width=5,height=4,noRStudioGD = TRUE, unit='in')
+plot(sil, col=1:4,border = NA)
+```
