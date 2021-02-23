@@ -39,7 +39,7 @@ scaledData <- as.matrix(scale(datos))
 ```
 ### Metodo de Codo (Elbow Method) para determinar numero optimo de clusters
 ``` {r }
-k.max  <- 25
+k.max  <- 15
 wss <- sapply(1:k.max, 
               function(k){kmeans(scaledData,k,iter.max = 100 )$tot.withinss})
 plot(1:k.max,wss,
@@ -49,18 +49,18 @@ plot(1:k.max,wss,
 ```
 ### Metodo de agrupamiento Kmeans
 ``` {r }
-km <- kmeans(scaledData,12,iter.max=100)
-summary(km)
+km <- kmeans(scaledData,4,iter.max=100)
+km
 ```
 
 ### Metodo de agrupamiento Fuzzy C Means
 ``` {r }
-res.fcm = fcm(scaledData,centers=12)
+res.fcm = fcm(scaledData,centers=4)
 summary(res.fcm)
 ```
 
 ### Metodo de agrupamiento Mixture of Gaussians
 ``` {r }
-mg = Mclust(scaledData,G=12)
+mg = Mclust(scaledData,G=4)
 summary(mg,parameters=TRUE)
 ```
